@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createWorker } from "tesseract.js";
 import { Calendar } from "@/components/ui/calendar";
@@ -21,45 +21,61 @@ const AddProduct = () => {
   const [price, setPrice] = useState("");
   const [date, setDate] = useState<Date>();
   const [processing, setProcessing] = useState(false);
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    // Start camera stream when component mounts
+    const startCamera = async () => {
+      try {
+        const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        setStream(mediaStream);
+        if (videoRef.current) {
+          videoRef.current.srcObject = mediaStream;
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to access camera. Please make sure camera permissions are granted.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    startCamera();
+
+    // Cleanup: stop camera stream when component unmounts
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
+
   const captureImage = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      const video = document.createElement("video");
-      const canvas = document.createElement("canvas");
-      
-      video.srcObject = stream;
-      await video.play();
-      
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      canvas.getContext("2d")?.drawImage(video, 0, 0);
-      
-      const imageData = canvas.toDataURL("image/jpeg");
-      setImage(imageData);
-      
-      // Stop the camera stream
-      stream.getTracks().forEach(track => track.stop());
-      
-      // Process the image with OCR
-      await processImage(imageData);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to access camera. Please make sure camera permissions are granted.",
-        variant: "destructive",
-      });
-    }
+    if (!videoRef.current) return;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    canvas.getContext("2d")?.drawImage(videoRef.current, 0, 0);
+    
+    const imageData = canvas.toDataURL("image/jpeg");
+    setImage(imageData);
+    
+    // Process the image with OCR
+    await processImage(imageData);
   };
 
   const processImage = async (imageData: string) => {
     setProcessing(true);
     try {
       const worker = await createWorker();
-      await worker.loadLanguage("eng");
-      await worker.initialize("eng");
+      await worker.load();
+      await worker.loadLanguage('eng');
+      await worker.initialize('eng');
       const { data: { text } } = await worker.recognize(imageData);
       await worker.terminate();
 
@@ -102,9 +118,12 @@ const AddProduct = () => {
                 className="w-full max-w-md rounded-lg shadow-md"
               />
             ) : (
-              <div className="w-full max-w-md aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
-                <p className="text-gray-500">No image captured</p>
-              </div>
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                className="w-full max-w-md rounded-lg shadow-md"
+              />
             )}
             <Button 
               type="button" 
