@@ -3,12 +3,15 @@ import { Cart } from "@/components/Cart";
 import { products } from "@/data/products";
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, Plus } from "lucide-react";
 import { AdBanner } from "@/components/AdBanner";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [columns, setColumns] = useState(3);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const updateColumns = () => {
@@ -36,7 +39,16 @@ const Index = () => {
         
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Our Products</h1>
-          <Cart />
+          <div className="flex items-center gap-4">
+            <Button
+              onClick={() => navigate("/add-product")}
+              className="flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Add Product
+            </Button>
+            <Cart />
+          </div>
         </div>
         
         <div className="relative mb-6 max-w-md mx-auto">
