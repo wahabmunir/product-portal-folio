@@ -8,24 +8,32 @@ export function ProductCard({ product }: { product: Product }) {
   const navigate = useNavigate();
 
   return (
-    <div className="product-card rounded-lg border bg-card text-card-foreground shadow-sm">
-      <img
-        src={product.image}
-        alt={product.name}
-        className="h-48 w-full object-cover rounded-t-lg"
-        onClick={() => navigate(`/product/${product.id}`)}
-      />
-      <div className="p-4">
-        <h3 className="text-lg font-semibold">{product.name}</h3>
-        <p className="text-muted-foreground">${product.price.toFixed(2)}</p>
-        <div className="mt-4 flex justify-between items-center">
+    <div className="product-card rounded-lg border bg-card text-card-foreground shadow-sm flex flex-col h-full">
+      <div className="relative pt-[100%]">
+        <img
+          src={product.image}
+          alt={product.name}
+          className="absolute top-0 left-0 w-full h-full object-cover rounded-t-lg cursor-pointer"
+          onClick={() => navigate(`/product/${product.id}`)}
+        />
+      </div>
+      <div className="p-4 flex flex-col flex-grow">
+        <h3 className="text-lg font-semibold mb-2 line-clamp-2">{product.name}</h3>
+        <p className="text-muted-foreground mb-4">${product.price.toFixed(2)}</p>
+        <div className="mt-auto flex justify-between items-center gap-2">
           <Button
             variant="outline"
+            className="flex-1"
             onClick={() => navigate(`/product/${product.id}`)}
           >
             View Details
           </Button>
-          <Button onClick={() => addItem(product)}>Add to Cart</Button>
+          <Button 
+            className="flex-1"
+            onClick={() => addItem(product)}
+          >
+            Add to Cart
+          </Button>
         </div>
       </div>
     </div>
