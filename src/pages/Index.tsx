@@ -4,20 +4,20 @@ import { products } from "@/data/products";
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { AdBanner } from "@/components/AdBanner";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [columns, setColumns] = useState(3);
 
-  // Dynamically adjust grid columns based on window width
   useEffect(() => {
     const updateColumns = () => {
       const width = window.innerWidth;
-      if (width < 640) setColumns(1); // mobile
-      else if (width < 1024) setColumns(2); // tablet
-      else if (width < 1280) setColumns(3); // small desktop
-      else if (width < 1536) setColumns(4); // large desktop
-      else setColumns(5); // extra large screens
+      if (width < 640) setColumns(1);
+      else if (width < 1024) setColumns(2);
+      else if (width < 1280) setColumns(3);
+      else if (width < 1536) setColumns(4);
+      else setColumns(5);
     };
 
     updateColumns();
@@ -32,6 +32,8 @@ const Index = () => {
   return (
     <div className="min-h-screen p-4 sm:p-6 lg:p-8">
       <div className="max-w-[2000px] mx-auto">
+        <AdBanner />
+        
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Our Products</h1>
           <Cart />
