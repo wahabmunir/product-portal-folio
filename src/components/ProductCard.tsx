@@ -2,6 +2,7 @@ import { Product } from "@/data/products";
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { Box } from "lucide-react";
 
 export function ProductCard({ product }: { product: Product }) {
   const { addItem } = useCart();
@@ -33,6 +34,14 @@ export function ProductCard({ product }: { product: Product }) {
             onClick={() => addItem(product)}
           >
             Add to Cart
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => navigate('/product-preview-3d')}
+            className="flex items-center gap-2"
+          >
+            <Box className="h-4 w-4" />
+            3D View
           </Button>
         </div>
       </div>

@@ -7,6 +7,7 @@ import { CartProvider } from "@/context/CartContext";
 import Index from "./pages/Index";
 import ProductDetail from "./pages/ProductDetail";
 import AddProduct from "./pages/AddProduct";
+import ProductPreview3D from "./pages/ProductPreview3D";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/add-product" element={<AddProduct />} />
+            <Route path="/product-preview-3d" element={<ProductPreview3D />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
