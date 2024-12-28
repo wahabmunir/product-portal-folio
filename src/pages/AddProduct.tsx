@@ -27,7 +27,6 @@ const AddProduct = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Start camera stream when component mounts
     const startCamera = async () => {
       try {
         const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -46,7 +45,6 @@ const AddProduct = () => {
 
     startCamera();
 
-    // Cleanup: stop camera stream when component unmounts
     return () => {
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
@@ -65,7 +63,6 @@ const AddProduct = () => {
     const imageData = canvas.toDataURL("image/jpeg");
     setImage(imageData);
     
-    // Process the image with OCR
     await processImage(imageData);
   };
 
@@ -73,14 +70,12 @@ const AddProduct = () => {
     setProcessing(true);
     try {
       const worker = await createWorker();
-      await worker.load();
-      await worker.loadLanguage('eng');
-      await worker.initialize('eng');
-      const { data: { text } } = await worker.recognize(imageData);
+      await worker.loadLanguage("eng");
+      await worker.initialize("eng");
+      const result = await worker.recognize(imageData);
       await worker.terminate();
 
-      // Extract a potential product name (first line or first few words)
-      const potentialName = text.split("\n")[0].trim();
+      const potentialName = result.data.text.split("\n")[0].trim();
       setSuggestedName(potentialName);
       setName(potentialName);
     } catch (error) {
@@ -96,7 +91,6 @@ const AddProduct = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically save the product to your backend
     toast({
       title: "Success",
       description: "Product added successfully!",
