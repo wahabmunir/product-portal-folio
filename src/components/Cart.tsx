@@ -2,9 +2,48 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ShoppingCart } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 export function Cart() {
   const { items, removeItem, updateQuantity, total } = useCart();
+  const { toast } = useToast();
+
+  const handleCheckout = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({ items }),
+        }
+      );
+
+      const { url, error } = await response.json();
+      
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Something went wrong. Please try again.",
+        });
+        return;
+      }
+
+      if (url) {
+        window.location.href = url;
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to initiate checkout. Please try again.",
+      });
+    }
+  };
 
   return (
     <Sheet>
@@ -70,7 +109,12 @@ export function Cart() {
                   <span>Total</span>
                   <span>${total.toFixed(2)}</span>
                 </div>
-                <Button className="w-full">Checkout</Button>
+                <Button 
+                  className="w-full" 
+                  onClick={handleCheckout}
+                >
+                  Checkout
+                </Button>
               </div>
             </>
           )}
